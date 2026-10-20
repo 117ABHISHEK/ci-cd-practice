@@ -1,0 +1,14 @@
+node_modules
+
+# Logs
+logs
+*.log
+npm-debug.log*
+
+# Test coverage
+coverage
+
+# Environment variables
+.env
+.env.*
+!.env.example
