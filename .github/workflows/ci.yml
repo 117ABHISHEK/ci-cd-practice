@@ -30,9 +30,9 @@ jobs:
 
       - name: Run Automated Tests
         run: npm test
-
+ 
   publish:
-    name: Build and Publish to GHCR
+    name: Build, Publish and Deploy
     needs: test
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
@@ -61,12 +61,40 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Build and Push Docker Image
+      - name: Build and Push Image
         uses: docker/build-push-action@v6
         with:
           context: .
+          platforms: linux/amd64
           push: true
           tags: ${{ steps.image.outputs.name }}:${{ github.sha }}
           labels: |
             org.opencontainers.image.source=${{ github.server_url }}/${{ github.repository }}
             org.opencontainers.image.revision=${{ github.sha }}
+
+      - name: Deploy Exact Image to Render
+        env:
+          RENDER_HOOK: ${{ secrets.RENDER_DEPLOY_HOOK_URL }}
+          IMAGE_NAME: ${{ steps.image.outputs.name }}
+          IMAGE_TAG: ${{ github.sha }}
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          if [[ -z "$RENDER_HOOK" ]]; then
+            echo "Render deploy hook secret is missing."
+            exit 1
+          fi
+
+          IMAGE_URL="${IMAGE_NAME}:${IMAGE_TAG}"
+          ENCODED_IMAGE=$(node -e \
+            'process.stdout.write(encodeURIComponent(process.argv[1]))' \
+            "$IMAGE_URL")
+
+          RESPONSE=$(curl --fail-with-body --silent --show-error \
+            --get \
+            --data-urlencode "imgURL=${IMAGE_URL}" \
+            "$RENDER_HOOK" \
+            --write-out '\nHTTP_STATUS:%{http_code}')
+
+          echo "$RESPONSE"
