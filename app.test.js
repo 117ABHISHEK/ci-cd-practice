@@ -22,4 +22,12 @@ describe("CI/CD Practice API", ()=>{
 
         expect(responce.statusCode).toBe(200);
     });
+
+    test("Get /version should return app vesion",async()=>{
+        const responce= await request(app).get("/version");
+
+        expect(responce.statusCode).toBe(200);
+        expect(responce.body.version).toBe("1.0.0");
+        
+    });
 });
