@@ -15,4 +15,10 @@ app.get("/health",(req,res)=>{
     });
 });
 
+app.get("/welcome",(req,res)=>{
+    res.status(200).json({
+        message:"Hello User",
+    });
+});
+
 module.exports=app;

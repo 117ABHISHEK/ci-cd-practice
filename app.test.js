@@ -16,4 +16,10 @@ describe("CI/CD Practice API", ()=>{
         expect(responce.statusCode).toBe(200);
         expect(responce.body.status).toBe("healthy");
     });
+
+    test("Get /welcome should return 200",async()=>{
+        const responce=await request(app).get("/welcome");
+
+        expect(responce.statusCode).toBe(200);
+    });
 });
