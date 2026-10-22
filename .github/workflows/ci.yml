@@ -57,7 +57,7 @@ jobs:
       - name: Build Docker Image Locally
         uses: docker/build-push-action@v6
         with:
-          context: .
+          context:
           platforms: linux/amd64
           load: true
           push: false
@@ -67,7 +67,7 @@ jobs:
             org.opencontainers.image.revision=${{ github.sha }}
 
       - name: Scan Docker Image with Trivy
-        uses: aquasecurity/trivy-action@0.36.0
+        uses: aquasecurity/trivy-action@v0.36.0
         with:
           image-ref: ${{ steps.image.outputs.name }}:${{ github.sha }}
           format: table
