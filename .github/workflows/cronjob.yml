@@ -1,0 +1,26 @@
+name: Health API Check
+
+on:
+  schedule:
+    - cron: "*/5 * * * *"
+  workflow_dispatch:
+
+jobs:
+  health-check:
+    name: Check Health API
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Validate Health API URL
+        env:
+          HEALTH_API_URL: ${{ vars.HEALTH_API_URL }}
+        run: |
+          if [ -z "$HEALTH_API_URL" ]; then
+            echo "Repository variable HEALTH_API_URL must be set to the full health endpoint URL."
+            exit 1
+          fi
+
+      - name: Hit Health API
+        env:
+          HEALTH_API_URL: ${{ vars.HEALTH_API_URL }}
+        run: curl --fail --silent --show-error --max-time 30 "$HEALTH_API_URL"
