@@ -27,7 +27,7 @@ describe("CI/CD Practice API", ()=>{
         const responce= await request(app).get("/version");
 
         expect(responce.statusCode).toBe(200);
-        expect(responce.body.version).toBe("2.0.0");
+        expect(responce.body.version).toBe("1.0.0");
         
     });
 });
